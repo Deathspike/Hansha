@@ -17,9 +17,9 @@
   });
 
   socket.addEventListener('message', function (event) {
-    var inflater = new Zlib.RawInflate(new Uint8Array(event.data));
-    var binaryReader = new BinaryReader(inflater.decompress());
-
+    var decompressedBuffer = decompress(event.data);
+    var begin = Date.now();
+    var binaryReader = new BinaryReader(decompressedBuffer);
     if (!hasStarted) {
       hasStarted = true;
       protocol.start(binaryReader, canvas, context);
@@ -28,7 +28,16 @@
       protocol.update(binaryReader, canvas, context);
       requestDraw();
     }
+    console.log('Processed in ' + (Date.now() - begin) + 'ms');
   });
+
+  function decompress(buffer) {
+    var begin = Date.now();
+    var inflater = new Zlib.RawInflate(new Uint8Array(buffer));
+    var decompressedBuffer = inflater.decompress();
+    console.log('Decompressed in ' + (Date.now() - begin) + 'ms');
+    return decompressedBuffer;
+  }
 
   function draw() {
     if (isDirty) {
