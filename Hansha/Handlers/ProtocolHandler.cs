@@ -5,7 +5,6 @@ using Hansha.Core;
 
 namespace Hansha
 {
-    // TODO: Consider switching to an event-driven approach. It will require ditching SharpEventLoop, though.
     public class ProtocolHandler : IHandler
     {
         private readonly int _maximumFramesPerSecond;
@@ -43,7 +42,7 @@ namespace Hansha
                         var beginTime = DateTime.Now.Ticks;
                         var screenFrame = screen.GetFrame(0);
 
-                        await protocol.DeltaAsync(screenFrame);
+                        await protocol.UpdateAsync(screenFrame);
 
                         var elapsedTime = (int) ((DateTime.Now.Ticks - beginTime) / TimeSpan.TicksPerSecond);
                         if (elapsedTime < delayPerFrame) await Task.Delay(delayPerFrame - elapsedTime);

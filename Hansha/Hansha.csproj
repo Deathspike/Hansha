@@ -39,6 +39,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\BinaryWriterExtension.cs" />
+    <Compile Include="Protocols\HyperProtocol.cs" />
+    <Compile Include="Protocols\HyperProtocolProvider.cs" />
     <Compile Include="Protocols\SimpleProtocol.cs" />
     <Compile Include="Protocols\SimpleProtocolProvider.cs" />
     <Compile Include="Interfaces\IHandler.cs" />
@@ -65,10 +68,16 @@
     <Content Include="Content\connect.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\protocols\hyperProtocol.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\protocols\simpleProtocol.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\rawInflate.min.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

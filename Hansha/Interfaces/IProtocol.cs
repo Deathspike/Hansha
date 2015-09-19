@@ -5,7 +5,7 @@ namespace Hansha
 {
     public interface IProtocol
     {
-        Task DeltaAsync(ScreenFrame frame);
         Task StartAsync(ScreenFrame frame);
+        Task UpdateAsync(ScreenFrame frame);
     }
 }
