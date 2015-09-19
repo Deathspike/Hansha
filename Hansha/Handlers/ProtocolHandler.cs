@@ -29,7 +29,7 @@ namespace Hansha
             if (context.Request.IsWebSocketRequest)
             {
                 var webSocketContext = await context.AcceptWebSocketAsync(null);
-                var protocolStream = new WebSocketProtocolStream(webSocketContext);
+                var protocolStream = new DebugStream(new WebSocketProtocolStream(webSocketContext));
                 var protocol = _protocolProvider.GetProtocol(protocolStream);
                 var delayPerFrame = 1000 / _maximumFramesPerSecond;
 
@@ -42,7 +42,10 @@ namespace Hansha
                         var beginTime = DateTime.Now.Ticks;
                         var screenFrame = screen.GetFrame(0);
 
-                        await protocol.UpdateAsync(screenFrame);
+                        if (screenFrame.MovedRegions.Length > 0 || screenFrame.ModifiedRegions.Length > 0)
+                        {
+                            await protocol.UpdateAsync(screenFrame);
+                        }
 
                         var elapsedTime = (int) ((DateTime.Now.Ticks - beginTime) / TimeSpan.TicksPerSecond);
                         if (elapsedTime < delayPerFrame) await Task.Delay(delayPerFrame - elapsedTime);

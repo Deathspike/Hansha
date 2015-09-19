@@ -3,6 +3,7 @@
   var context = canvas.getContext('2d');
   var hasStarted = false;
   var socket = new WebSocket('ws://' + window.location.host + '/ws');
+  var isDirty = false;
 
   context.webkitImageSmoothingEnabled = false;
   context.mozImageSmoothEnabled = false;
@@ -15,17 +16,29 @@
     location.reload();
   });
 
-  socket.addEventListener('message', function(event) {
+  socket.addEventListener('message', function (event) {
+    var inflater = new Zlib.RawInflate(new Uint8Array(event.data));
+    var binaryReader = new BinaryReader(inflater.decompress());
+
     if (!hasStarted) {
       hasStarted = true;
-      protocol.start(event.data, canvas, context);
+      protocol.start(binaryReader, canvas, context);
+      requestDraw();
     } else {
-      protocol.update(event.data, canvas, context);
+      protocol.update(binaryReader, canvas, context);
+      requestDraw();
     }
   });
 
-  (function draw() {
-    protocol.render(canvas, context);
+  function draw() {
+    if (isDirty) {
+      protocol.render(canvas, context);
+      isDirty = false;
+    }
+  }
+
+  function requestDraw() {
+    isDirty = true;
     requestAnimationFrame(draw);
-  })();
+  }
 })();

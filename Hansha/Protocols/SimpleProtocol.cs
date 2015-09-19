@@ -39,7 +39,7 @@ namespace Hansha
                     }
                 }
 
-                await _protocolStream.SendAsync(memoryStream.ToArray());
+                await _protocolStream.SendAsync(memoryStream.ToArray().Compress());
             }
         }
 
@@ -62,7 +62,7 @@ namespace Hansha
                     }
                 }
 
-                await _protocolStream.SendAsync(memoryStream.ToArray());
+                await _protocolStream.SendAsync(memoryStream.ToArray().Compress());
             }
         }
 

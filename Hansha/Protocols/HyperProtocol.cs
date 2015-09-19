@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
 using Hansha.Core;
@@ -77,7 +76,6 @@ namespace Hansha
         {
             using (var memoryStream = new MemoryStream())
             {
-                using (var deflateStream = new DeflateStream(memoryStream, CompressionMode.Compress, true))
                 using (var binaryWriter = new BinaryWriter(memoryStream, Encoding.Default, true))
                 {
                     binaryWriter.Write((ushort)frame.Boundaries.Right);
@@ -90,7 +88,7 @@ namespace Hansha
                     }
                 }
 
-                await _protocolStream.SendAsync(memoryStream.ToArray());
+                await _protocolStream.SendAsync(memoryStream.ToArray().Compress());
             }
         }
 
@@ -98,14 +96,13 @@ namespace Hansha
         {
             using (var memoryStream = new MemoryStream())
             {
-                using (var deflateStream = new DeflateStream(memoryStream, CompressionMode.Compress, true))
                 using (var binaryWriter = new BinaryWriter(memoryStream, Encoding.Default, true))
                 {
                     ProcessMovedRegions(binaryWriter, frame);
                     ProcessModifiedRegions(binaryWriter, frame);
                 }
 
-                await _protocolStream.SendAsync(memoryStream.ToArray());
+                await _protocolStream.SendAsync(memoryStream.ToArray().Compress());
             }
         }
 

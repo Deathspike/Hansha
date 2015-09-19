@@ -1,51 +1,30 @@
 ﻿// TODO: Implement dirty rendering support. Currently just overwriting the entire image, which is bad.
 var protocol = (function () {
   var image = null;
-  var isDirty = false;
-
-
   var screenHeight = 0;
   var screenWidth = 0;
 
   return {
     render: function (canvas, context) {
-      if (isDirty) {
-        debugger;
-        context.putImageData(image, 0, 0);
-        isDirty = false;
-      }
+      context.putImageData(image, 0, 0);
     },
 
-    start: function (buffer, canvas, context) {
-      var binaryReader = new BinaryReader(buffer);
-
+    start: function (binaryReader, canvas, context) {
       screenWidth = canvas.width = binaryReader.readUnsignedShort();
       screenHeight = canvas.height = binaryReader.readUnsignedShort();
       image = context.createImageData(canvas.width, canvas.height);
-
-      debugger;
-
+      
       for (var index = 0; !binaryReader.isEndOfBuffer(); index += 4) {
         processPixel(binaryReader, index);
       }
-
-      isDirty = true;
     },
 
-    update: function (buffer, canvas, context) {
-      var binaryReader = new BinaryReader(buffer);
+    update: function (binaryReader, canvas, context) {
       processMovedRegions(binaryReader);
       processModifiedRegions(binaryReader);
-      isDirty = true;
     }
   };
-
-  function decompress(buffer) {
-    var bufferView = new Uint8Array(buffer);
-    var inflater = new Zlib.RawInflate(bufferView);
-    return inflater.decompress();
-  }
-
+  
   function processMovedRegions(binaryReader) {
     var numberOfMovedRegions = binaryReader.readUnsignedVariableLength();
 
