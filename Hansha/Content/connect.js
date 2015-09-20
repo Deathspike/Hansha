@@ -17,9 +17,8 @@
   });
 
   socket.addEventListener('message', function (event) {
-    var decompressedBuffer = decompress(event.data);
     var begin = Date.now();
-    var binaryReader = new BinaryReader(decompressedBuffer);
+    var binaryReader = new BinaryReader(decompress(event.data));
     if (!hasStarted) {
       hasStarted = true;
       protocol.start(binaryReader, canvas, context);
@@ -41,8 +40,10 @@
 
   function draw() {
     if (isDirty) {
+      var begin = Date.now();
       protocol.render(canvas, context);
       isDirty = false;
+      console.log('Rendered in ' + (Date.now() - begin) + 'ms');
     }
   }
 

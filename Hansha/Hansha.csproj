@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\BinaryWriterExtension.cs" />
+    <Compile Include="Extensions\ByteArrayExtension.cs" />
     <Compile Include="Protocols\HyperProtocol.cs" />
     <Compile Include="Protocols\HyperProtocolProvider.cs" />
     <Compile Include="Protocols\SimpleProtocol.cs" />
@@ -53,7 +54,6 @@
     <Compile Include="Handlers\ProtocolHandler.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Handlers\StaticHandler.cs" />
-    <Compile Include="Extensions\ByteArrayExtension.cs" />
     <Compile Include="Streams\DebugStream.cs" />
     <Compile Include="Streams\WebSocketProtocolStream.cs" />
   </ItemGroup>

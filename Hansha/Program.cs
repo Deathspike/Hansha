@@ -15,7 +15,7 @@ namespace Hansha
             {
                 EventLoop.Pump(() =>
                 {
-                    server.Add(new ProtocolHandler(5, protocolProvider, screenProvider));
+                    server.Add(new ProtocolHandler(20, protocolProvider, screenProvider));
                     server.Add(new StaticHandler("Content"));
                     EventLoop.Run(server.RunAsync);
                 });
