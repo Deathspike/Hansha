@@ -24,7 +24,7 @@ BinaryReader.prototype.isEndOfBuffer = function () {
 BinaryReader.prototype.readBytes = function (count) {
   var buffer = [];
   for (var i = 0; i < count; i++) {
-    buffer.push(this._buffer[this._position++]);
+    buffer.push(this.readUnsignedByte());
   }
   return buffer;
 };
@@ -88,10 +88,10 @@ BinaryReader.prototype.readUnsignedByte = function () {
  * @return {number} The unsigned integer.
  */
 BinaryReader.prototype.readUnsignedInteger = function () {
-  var b0 = this._buffer[this._position++];
-  var b1 = this._buffer[this._position++];
-  var b2 = this._buffer[this._position++];
-  var b3 = this._buffer[this._position++];
+  var b0 = this.readUnsignedByte();
+  var b1 = this.readUnsignedByte();
+  var b2 = this.readUnsignedByte();
+  var b3 = this.readUnsignedByte();
   return b0 |(b1 << 8) | (b2 << 16) | (b3 << 24);
 };
 
@@ -100,8 +100,8 @@ BinaryReader.prototype.readUnsignedInteger = function () {
  * @return {number} The unsigned short.
  */
 BinaryReader.prototype.readUnsignedShort = function () {
-  var b0 = this._buffer[this._position++];
-  var b1 = this._buffer[this._position++];
+  var b0 = this.readUnsignedByte();
+  var b1 = this.readUnsignedByte();
   return b0 | (b1 << 8);
 };
 

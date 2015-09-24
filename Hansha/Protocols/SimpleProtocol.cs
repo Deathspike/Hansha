@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,13 +49,37 @@ namespace Hansha
         public async Task UpdateAsync(ScreenFrame frame)
         {
             var beginTime = DateTime.Now;
+            var changedPixels = 0;
+
             var np = frame.NewPixels;
-            var npLength = np.Length;
             var pp = frame.PreviousPixels;
 
             _stream.Position = 0;
 
-            for (var i = 0; i < npLength; i += 4)
+            /*if (frame.MovedRegions.Length != 0)
+            {
+                Console.WriteLine("A moved region was UNPROCESSED");
+            }
+
+            foreach (var modifiedRegion in frame.ModifiedRegions)
+            {
+                var widthInBytes = frame.Boundaries.Right * 4;
+
+                for (int y = modifiedRegion.Top, yOffset = y * widthInBytes; y < modifiedRegion.Bottom; y++, yOffset += widthInBytes)
+                {
+                    for (int x = modifiedRegion.Left, xOffset = x * 4, i = yOffset + xOffset; x < modifiedRegion.Right; x++, i += 4)
+                    {
+                        if (np[i] == pp[i] && np[i + 1] == pp[i + 1] && np[i + 2] == pp[i + 2]) continue;
+                        _writer.Write((uint)i);
+                        _writer.Write(np[i]);
+                        _writer.Write(np[i + 1]);
+                        _writer.Write(np[i + 2]);
+                        changedPixels++;
+                    }
+                }
+            }*/
+
+            for (var i = 0; i < np.Length; i += 4)
             {
                 if (np[i] == pp[i] && np[i + 1] == pp[i + 1] && np[i + 2] == pp[i + 2]) continue;
                 _writer.Write((uint)i);
@@ -63,7 +88,7 @@ namespace Hansha
                 _writer.Write(np[i + 2]);
             }
 
-            Console.WriteLine("Spent {0}ms processing frame", (DateTime.Now - beginTime).Milliseconds);
+            Console.WriteLine("Spent {0}ms processing frame ({1} changes)", (DateTime.Now - beginTime).Milliseconds, changedPixels);
 
             await _protocolStream.SendAsync(_buffer, 0, (int)_stream.Position);
         }

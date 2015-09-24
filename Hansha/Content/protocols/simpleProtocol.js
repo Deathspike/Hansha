@@ -4,7 +4,7 @@ var protocol = (function () {
   var imageData = null;
 
   return {
-    render: function(canvas, context) {
+    render: function (canvas, context) {
       context.putImageData(image, 0, 0);
     },
 
@@ -22,7 +22,7 @@ var protocol = (function () {
       }
     },
 
-    update: function (binaryReader, canvas, context) {
+    update: function (binaryReader) {
       while (!binaryReader.isEndOfBuffer()) {
         var index = binaryReader.readUnsignedInteger();
         imageData[index + 2] = binaryReader.readUnsignedByte();
