@@ -8,13 +8,15 @@ namespace Hansha
 {
     public class WebSocketProtocolStream : IProtocolStream
     {
-        private readonly WebSocketContext _context;
+        private readonly byte[] _receiveBuffer;
+        private readonly WebSocket _webSocket;
 
         #region Constructor
 
-        public WebSocketProtocolStream(WebSocketContext context)
+        public WebSocketProtocolStream(WebSocket webSocket)
         {
-            _context = context;
+            _receiveBuffer = new byte[1024];
+            _webSocket = webSocket;
         }
 
         #endregion
@@ -23,16 +25,16 @@ namespace Hansha
 
         public Task CloseAsync()
         {
-            return _context.WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
+            return _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);
         }
 
         public async Task<byte[]> ReceiveAsync()
         {
             using (var memoryStream = new MemoryStream())
             {
-                var buffer = new ArraySegment<byte>(new byte[1024]);
+                var buffer = new ArraySegment<byte>(_receiveBuffer);
 
-                while (!(await _context.WebSocket.ReceiveAsync(buffer, CancellationToken.None)).EndOfMessage)
+                while (!(await _webSocket.ReceiveAsync(buffer, CancellationToken.None)).EndOfMessage)
                 {
                     memoryStream.Write(buffer.Array, buffer.Offset, buffer.Count);
                 }
@@ -45,7 +47,7 @@ namespace Hansha
         {
             var arraySegment = new ArraySegment<byte>(buffer, offset, count);
 
-            return _context.WebSocket.SendAsync(arraySegment, WebSocketMessageType.Binary, true, CancellationToken.None);
+            return _webSocket.SendAsync(arraySegment, WebSocketMessageType.Binary, true, CancellationToken.None);
         }
 
         #endregion
