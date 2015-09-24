@@ -30,7 +30,7 @@ namespace Hansha
         {
             using (var memoryStream = new MemoryStream())
             {
-                var buffer = new ArraySegment<byte>();
+                var buffer = new ArraySegment<byte>(new byte[1024]);
 
                 while (!(await _context.WebSocket.ReceiveAsync(buffer, CancellationToken.None)).EndOfMessage)
                 {
@@ -41,9 +41,11 @@ namespace Hansha
             }
         }
 
-        public Task SendAsync(byte[] buffer)
+        public Task SendAsync(byte[] buffer, int offset, int count)
         {
-            return _context.WebSocket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Binary, true, CancellationToken.None);
+            var arraySegment = new ArraySegment<byte>(buffer, offset, count);
+
+            return _context.WebSocket.SendAsync(arraySegment, WebSocketMessageType.Binary, true, CancellationToken.None);
         }
 
         #endregion

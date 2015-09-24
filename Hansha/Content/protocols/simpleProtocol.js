@@ -1,6 +1,7 @@
-﻿// TODO: Implement dirty rendering support. Currently just overwriting the entire image, which is bad.
+﻿// TODO: Support dirty rendering.
 var protocol = (function () {
   var image = null;
+  var imageData = null;
 
   return {
     render: function(canvas, context) {
@@ -11,21 +12,22 @@ var protocol = (function () {
       canvas.width = binaryReader.readUnsignedShort();
       canvas.height = binaryReader.readUnsignedShort();
       image = context.createImageData(canvas.width, canvas.height);
+      imageData = image.data;
 
-      for (var p = 0; !binaryReader.isEndOfBuffer() ; p += 4) {
-        image.data[p + 2] = binaryReader.readUnsignedByte();
-        image.data[p + 1] = binaryReader.readUnsignedByte();
-        image.data[p + 0] = binaryReader.readUnsignedByte();
-        image.data[p + 3] = 255;
+      for (var index = 0; !binaryReader.isEndOfBuffer() ; index += 4) {
+        imageData[index + 2] = binaryReader.readUnsignedByte();
+        imageData[index + 1] = binaryReader.readUnsignedByte();
+        imageData[index + 0] = binaryReader.readUnsignedByte();
+        imageData[index + 3] = 255;
       }
     },
 
     update: function (binaryReader, canvas, context) {
       while (!binaryReader.isEndOfBuffer()) {
-        var p = binaryReader.readUnsignedInteger();
-        image.data[p + 2] = binaryReader.readUnsignedByte();
-        image.data[p + 1] = binaryReader.readUnsignedByte();
-        image.data[p + 0] = binaryReader.readUnsignedByte();
+        var index = binaryReader.readUnsignedInteger();
+        imageData[index + 2] = binaryReader.readUnsignedByte();
+        imageData[index + 1] = binaryReader.readUnsignedByte();
+        imageData[index + 0] = binaryReader.readUnsignedByte();
       }
     }
   };

@@ -6,6 +6,6 @@ namespace Hansha
     {
         Task CloseAsync();
         Task<byte[]> ReceiveAsync();
-        Task SendAsync(byte[] bytes);
+        Task SendAsync(byte[] buffer, int offset, int count);
     }
 }

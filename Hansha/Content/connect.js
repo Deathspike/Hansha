@@ -31,11 +31,12 @@
   });
 
   function decompress(buffer) {
-    var begin = Date.now();
+    return buffer;
+    /*var begin = Date.now();
     var inflater = new Zlib.RawInflate(new Uint8Array(buffer));
     var decompressedBuffer = inflater.decompress();
     console.log('Decompressed in ' + (Date.now() - begin) + 'ms');
-    return decompressedBuffer;
+    return decompressedBuffer;*/
   }
 
   function draw() {

@@ -8,6 +8,7 @@ namespace Hansha
     public class HyperProtocol : IProtocol
     {
         private readonly IProtocolStream _protocolStream;
+        private byte[] _buffer;
 
         #region Abstract
 
@@ -71,10 +72,12 @@ namespace Hansha
         #endregion
 
         #region Implementation of IProtocol
-        
+
         public async Task StartAsync(ScreenFrame frame)
         {
-            using (var memoryStream = new MemoryStream())
+            _buffer = new byte[frame.Boundaries.Bottom * frame.Boundaries.Right * 4];
+
+            using (var memoryStream = new MemoryStream(_buffer))
             {
                 using (var binaryWriter = new BinaryWriter(memoryStream, Encoding.Default, true))
                 {
@@ -88,13 +91,13 @@ namespace Hansha
                     }
                 }
 
-                await _protocolStream.SendAsync(memoryStream.ToArray().Compress());
+                await _protocolStream.SendAsync(_buffer, 0, (int) memoryStream.Position);
             }
         }
 
         public async Task UpdateAsync(ScreenFrame frame)
         {
-            using (var memoryStream = new MemoryStream())
+            using (var memoryStream = new MemoryStream(_buffer))
             {
                 using (var binaryWriter = new BinaryWriter(memoryStream, Encoding.Default, true))
                 {
@@ -102,7 +105,7 @@ namespace Hansha
                     ProcessModifiedRegions(binaryWriter, frame);
                 }
 
-                await _protocolStream.SendAsync(memoryStream.ToArray().Compress());
+                await _protocolStream.SendAsync(_buffer, 0, (int)memoryStream.Position);
             }
         }
 

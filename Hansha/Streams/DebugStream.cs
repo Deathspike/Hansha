@@ -30,7 +30,7 @@ namespace Hansha
             return _protocolStream.ReceiveAsync();
         }
 
-        public Task SendAsync(byte[] bytes)
+        public Task SendAsync(byte[] buffer, int offset, int count)
         {
             if (_reportTime == null || _reportTime <= DateTime.Now)
             {
@@ -39,9 +39,9 @@ namespace Hansha
                 _reportTime = DateTime.Now.AddSeconds(1);
             }
 
-            _numberOfBytes += bytes.Length;
+            _numberOfBytes += buffer.Length;
 
-            return _protocolStream.SendAsync(bytes);
+            return _protocolStream.SendAsync(buffer, offset, count);
         }
 
         #endregion
