@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Hansha
 {
-    public class WebSocketProtocolStream : IProtocolStream
+    public class WebSocketStream : IProtocolStream
     {
         private readonly byte[] _receiveBuffer;
         private readonly WebSocket _webSocket;
 
         #region Constructor
 
-        public WebSocketProtocolStream(WebSocket webSocket)
+        public WebSocketStream(WebSocket webSocket)
         {
             _receiveBuffer = new byte[1024];
             _webSocket = webSocket;

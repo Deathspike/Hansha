@@ -32,7 +32,7 @@ namespace Hansha
             if (context.Request.IsWebSocketRequest)
             {
                 var webSocketContext = await context.AcceptWebSocketAsync(null);
-                var protocolStream = new DebugStream(new WebSocketProtocolStream(webSocketContext.WebSocket));
+                var protocolStream = new DebugStream(new WebSocketStream(webSocketContext.WebSocket));
                 var protocol = _protocolProvider.GetProtocol(protocolStream);
                 var delayPerFrame = 1000 / _maximumFramesPerSecond;
 
