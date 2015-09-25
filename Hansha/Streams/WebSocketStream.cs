@@ -34,9 +34,16 @@ namespace Hansha
             {
                 var buffer = new ArraySegment<byte>(_receiveBuffer);
 
-                while (!(await _webSocket.ReceiveAsync(buffer, CancellationToken.None)).EndOfMessage)
+                while (true)
                 {
-                    memoryStream.Write(buffer.Array, buffer.Offset, buffer.Count);
+                    var result = await _webSocket.ReceiveAsync(buffer, CancellationToken.None);
+
+                    memoryStream.Write(buffer.Array, buffer.Offset, result.Count);
+                    
+                    if (result.EndOfMessage)
+                    {
+                        break;
+                    }
                 }
 
                 return memoryStream.ToArray();

@@ -29,7 +29,7 @@ namespace Hansha
         
         public async Task StartAsync(ScreenFrame frame)
         {
-            _buffer = new byte[4 + frame.Boundaries.Bottom * frame.Boundaries.Right * 7];
+            _buffer = new byte[frame.Boundaries.Bottom * frame.Boundaries.Right * 7];
             _stream = new MemoryStream(_buffer);
             _writer = new BinaryWriter(_stream);
 
@@ -86,6 +86,7 @@ namespace Hansha
                 _writer.Write(np[i]);
                 _writer.Write(np[i + 1]);
                 _writer.Write(np[i + 2]);
+                changedPixels++;
             }
 
             Console.WriteLine("Spent {0}ms processing frame ({1} changes)", (DateTime.Now - beginTime).Milliseconds, changedPixels);
