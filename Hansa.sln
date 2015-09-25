@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hansha.Screenshot", "Hansha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hansha.TestProtocol", "Hansha.TestProtocol\Hansha.TestProtocol.csproj", "{5EF85BA5-B6D7-4C42-BFBD-DF484C6CD912}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hansha.Core.BitBlt", "Hansha.Core.BitBlt\Hansha.Core.BitBlt.csproj", "{509E3BD8-4864-4B5C-B559-8D45430794B4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{5EF85BA5-B6D7-4C42-BFBD-DF484C6CD912}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5EF85BA5-B6D7-4C42-BFBD-DF484C6CD912}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5EF85BA5-B6D7-4C42-BFBD-DF484C6CD912}.Release|Any CPU.Build.0 = Release|Any CPU
+		{509E3BD8-4864-4B5C-B559-8D45430794B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{509E3BD8-4864-4B5C-B559-8D45430794B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{509E3BD8-4864-4B5C-B559-8D45430794B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{509E3BD8-4864-4B5C-B559-8D45430794B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

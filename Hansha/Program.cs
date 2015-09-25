@@ -1,4 +1,5 @@
 ﻿using System;
+using Hansha.Core.BitBlt;
 using Hansha.Core.DesktopDuplication;
 
 namespace Hansha
@@ -9,7 +10,7 @@ namespace Hansha
         {
             // The protocol on the client-side must match.
             var protocolProvider = new SimpleProtocolProvider();
-            var screenProvider = new DesktopDuplicationScreenProvider();
+            var screenProvider = new BitBltScreenProvider(); // new DesktopDuplicationScreenProvider();
 
             using (var server = new Server("http://+:5050/"))
             {
