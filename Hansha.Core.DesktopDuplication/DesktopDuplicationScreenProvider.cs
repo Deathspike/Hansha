@@ -1,8 +1,10 @@
-﻿using System.Threading;
+﻿using System.ComponentModel.Composition;
+using System.Threading;
 
 namespace Hansha.Core.DesktopDuplication
 {
     // TODO: Figure out why Desktop Duplication API fails to capture the screen without an initial delay.
+    [Export(typeof (IScreenProvider))]
     public class DesktopDuplicationScreenProvider : IScreenProvider
     {
         #region Implementation of IScreenProvider

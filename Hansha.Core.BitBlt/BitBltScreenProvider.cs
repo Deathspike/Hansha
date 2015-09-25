@@ -1,5 +1,8 @@
-﻿namespace Hansha.Core.BitBlt
+﻿using System.ComponentModel.Composition;
+
+namespace Hansha.Core.BitBlt
 {
+    [Export(typeof(IScreenProvider))]
     public class BitBltScreenProvider : IScreenProvider
     {
         #region Implementation of IScreenProvider
