@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using Hansha.Core;
 
@@ -26,15 +24,15 @@ namespace Hansha
         #endregion
 
         #region Implementation of IProtocol
-        
+
         public async Task StartAsync(ScreenFrame frame)
         {
             _buffer = new byte[frame.Boundaries.Bottom * frame.Boundaries.Right * 7];
             _stream = new MemoryStream(_buffer);
             _writer = new BinaryWriter(_stream);
 
-            _writer.Write((ushort)frame.Boundaries.Right);
-            _writer.Write((ushort)frame.Boundaries.Bottom);
+            _writer.Write((ushort) frame.Boundaries.Right);
+            _writer.Write((ushort) frame.Boundaries.Bottom);
 
             for (var i = 0; i < frame.NewPixels.Length; i += 4)
             {
@@ -43,9 +41,9 @@ namespace Hansha
                 _writer.Write(frame.NewPixels[i + 2]);
             }
 
-            await _protocolStream.SendAsync(_buffer, 0, (int)_stream.Position);
+            await _protocolStream.SendAsync(_buffer, 0, (int) _stream.Position);
         }
-        
+
         public async Task UpdateAsync(ScreenFrame frame)
         {
             var beginTime = DateTime.Now;
@@ -82,7 +80,7 @@ namespace Hansha
             for (var i = 0; i < np.Length; i += 4)
             {
                 if (np[i] == pp[i] && np[i + 1] == pp[i + 1] && np[i + 2] == pp[i + 2]) continue;
-                _writer.Write((uint)i);
+                _writer.Write((uint) i);
                 _writer.Write(np[i]);
                 _writer.Write(np[i + 1]);
                 _writer.Write(np[i + 2]);
@@ -91,7 +89,7 @@ namespace Hansha
 
             Console.WriteLine("Spent {0}ms processing frame ({1} changes)", (DateTime.Now - beginTime).Milliseconds, changedPixels);
 
-            await _protocolStream.SendAsync(_buffer, 0, (int)_stream.Position);
+            await _protocolStream.SendAsync(_buffer, 0, (int) _stream.Position);
         }
 
         #endregion
