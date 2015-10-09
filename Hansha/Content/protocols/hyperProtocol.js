@@ -46,7 +46,7 @@ var protocol = (function () {
           var xOrigin = fromX + xOffset;
           var xOriginIndex = yOriginIndex + xOrigin * 4;
           var xDestination = toX + xOffset;
-          var xDestinationIndex = yDestinationIndex * xDestination * 4;
+          var xDestinationIndex = yDestinationIndex + xDestination * 4;
 
           image.data[xDestinationIndex + 0] = image.data[xOriginIndex + 0];
           image.data[xDestinationIndex + 1] = image.data[xOriginIndex + 1];
