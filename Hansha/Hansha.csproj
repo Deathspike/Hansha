@@ -43,8 +43,6 @@
   <ItemGroup>
     <Compile Include="Extensions\BinaryWriterExtension.cs" />
     <Compile Include="Extensions\ByteArrayExtension.cs" />
-    <Compile Include="Protocols\HyperProtocol.cs" />
-    <Compile Include="Protocols\HyperProtocolProvider.cs" />
     <Compile Include="Protocols\SimpleProtocol.cs" />
     <Compile Include="Protocols\SimpleProtocolProvider.cs" />
     <Compile Include="Interfaces\IHandler.cs" />

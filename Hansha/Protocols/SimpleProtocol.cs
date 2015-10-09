@@ -5,14 +5,56 @@ using Hansha.Core;
 
 namespace Hansha
 {
-    // TODO: `SimpleProtocol` should support moving regions and dirty regions, too.
     // TODO: Consider a protocol implementation based on acknowledgements. The current protocols just force a certain rate down the stream.
     public class SimpleProtocol : IProtocol
     {
         private readonly IProtocolStream _protocolStream;
         private byte[] _buffer;
+        private byte[] _bufferC;
         private MemoryStream _stream;
         private BinaryWriter _writer;
+
+        #region Abstract
+
+        private void ProcessModifiedRegions(ScreenFrame frame)
+        {
+            var n = frame.NewPixels;
+            var p = frame.PreviousPixels;
+
+            foreach (var region in frame.ModifiedRegions)
+            {
+                var widthInBytes = frame.Boundaries.Right * 4;
+
+                for (int y = region.Top, yOffset = y * widthInBytes; y < region.Bottom; y++, yOffset += widthInBytes)
+                {
+                    for (int x = region.Left, xOffset = x * 4, i = yOffset + xOffset; x < region.Right; x++, i += 4)
+                    {
+                        if (n[i] == p[i] && n[i + 1] == p[i + 1] && n[i + 2] == p[i + 2]) continue;
+                        _writer.Write(i);
+                        _writer.Write(n[i]);
+                        _writer.Write(n[i + 1]);
+                        _writer.Write(n[i + 2]);
+                    }
+                }
+            }
+        }
+
+        private void ProcessMovedRegions(ScreenFrame frame)
+        {
+            _writer.Write(frame.MovedRegions.Length);
+
+            foreach (var region in frame.MovedRegions)
+            {
+                _writer.Write(region.X);
+                _writer.Write(region.Y);
+                _writer.Write(region.Destination.Left);
+                _writer.Write(region.Destination.Top);
+                _writer.Write(region.Destination.Right - region.Destination.Left);
+                _writer.Write(region.Destination.Bottom - region.Destination.Top);
+            }
+        }
+
+        #endregion
 
         #region Constructor
 
@@ -28,11 +70,12 @@ namespace Hansha
         public async Task StartAsync(ScreenFrame frame)
         {
             _buffer = new byte[frame.Boundaries.Bottom * frame.Boundaries.Right * 7];
+            _bufferC = new byte[_buffer.Length];
             _stream = new MemoryStream(_buffer);
             _writer = new BinaryWriter(_stream);
 
-            _writer.Write((ushort) frame.Boundaries.Right);
-            _writer.Write((ushort) frame.Boundaries.Bottom);
+            _writer.Write(frame.Boundaries.Right);
+            _writer.Write(frame.Boundaries.Bottom);
 
             for (var i = 0; i < frame.NewPixels.Length; i += 4)
             {
@@ -41,55 +84,26 @@ namespace Hansha
                 _writer.Write(frame.NewPixels[i + 2]);
             }
 
-            await _protocolStream.SendAsync(_buffer, 0, (int) _stream.Position);
+            var clen = _buffer.CompressQuick(0, (int)_stream.Position, _bufferC);
+
+            await _protocolStream.SendAsync(_bufferC, 0, clen);
         }
+
 
         public async Task UpdateAsync(ScreenFrame frame)
         {
             var beginTime = DateTime.Now;
-            var changedPixels = 0;
-
-            var np = frame.NewPixels;
-            var pp = frame.PreviousPixels;
 
             _stream.Position = 0;
 
-            /*if (frame.MovedRegions.Length != 0)
-            {
-                Console.WriteLine("A moved region was UNPROCESSED");
-            }
+            ProcessMovedRegions(frame);
+            ProcessModifiedRegions(frame);
 
-            foreach (var modifiedRegion in frame.ModifiedRegions)
-            {
-                var widthInBytes = frame.Boundaries.Right * 4;
+            var clen = _buffer.CompressQuick(0, (int)_stream.Position, _bufferC);
 
-                for (int y = modifiedRegion.Top, yOffset = y * widthInBytes; y < modifiedRegion.Bottom; y++, yOffset += widthInBytes)
-                {
-                    for (int x = modifiedRegion.Left, xOffset = x * 4, i = yOffset + xOffset; x < modifiedRegion.Right; x++, i += 4)
-                    {
-                        if (np[i] == pp[i] && np[i + 1] == pp[i + 1] && np[i + 2] == pp[i + 2]) continue;
-                        _writer.Write((uint)i);
-                        _writer.Write(np[i]);
-                        _writer.Write(np[i + 1]);
-                        _writer.Write(np[i + 2]);
-                        changedPixels++;
-                    }
-                }
-            }*/
+            Console.WriteLine("Frame in {0}ms", (DateTime.Now - beginTime).TotalMilliseconds);
 
-            for (var i = 0; i < np.Length; i += 4)
-            {
-                if (np[i] == pp[i] && np[i + 1] == pp[i + 1] && np[i + 2] == pp[i + 2]) continue;
-                _writer.Write((uint) i);
-                _writer.Write(np[i]);
-                _writer.Write(np[i + 1]);
-                _writer.Write(np[i + 2]);
-                changedPixels++;
-            }
-
-            Console.WriteLine("Spent {0}ms processing frame ({1} changes)", (DateTime.Now - beginTime).Milliseconds, changedPixels);
-
-            await _protocolStream.SendAsync(_buffer, 0, (int) _stream.Position);
+            await _protocolStream.SendAsync(_bufferC, 0, clen);
         }
 
         #endregion
