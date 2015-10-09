@@ -7,7 +7,6 @@ using Hansha.Core;
 namespace Hansha
 {
     // TODO: permessage-deflate. How do I get this? A new WebSocket handler? Protocols should not be aware of compression.
-    // TODO: It's currently using a Timeout.Infinite, thus, blocking additional readers for all intents and purposes.
     public class ProtocolHandler : IHandler
     {
         private readonly int _maximumFramesPerSecond;
@@ -43,9 +42,9 @@ namespace Hansha
                     while (true)
                     {
                         var beginTime = DateTime.Now.Ticks;
-                        var screenFrame = screen.GetFrame(Timeout.Infinite);
+                        var screenFrame = screen.GetFrame(0);
 
-                        if (screenFrame.MovedRegions.Length > 0 || screenFrame.ModifiedRegions.Length > 0)
+                        if (screenFrame != null && (screenFrame.ModifiedRegions.Length > 0 || screenFrame.MovedRegions.Length > 0))
                         {
                             await protocol.UpdateAsync(screenFrame);
                         }
