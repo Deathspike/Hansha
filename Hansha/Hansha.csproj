@@ -41,6 +41,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\BinaryReaderExtension.cs" />
     <Compile Include="Extensions\BinaryWriterExtension.cs" />
     <Compile Include="Extensions\ByteArrayExtension.cs" />
     <Compile Include="Protocols\SimpleProtocol.cs" />
