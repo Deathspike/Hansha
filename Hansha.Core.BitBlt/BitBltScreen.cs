@@ -6,8 +6,8 @@ namespace Hansha.Core.BitBlt
     // TODO: Optimize `ModifiedRegions` and `MovedRegions` array allocation.
     public class BitBltScreen : IScreen
     {
+        private readonly ScreenFrame _frame;
         private readonly IntPtr _windowHandle;
-        private ScreenFrame _frame;
         private IntPtr _handleBitmap;
         private IntPtr _handleDeviceContext;
         private IntPtr _handleMemoryDeviceContext;
@@ -49,6 +49,7 @@ namespace Hansha.Core.BitBlt
 
         public BitBltScreen(IntPtr windowHandle)
         {
+            _frame = new ScreenFrame();
             _windowHandle = windowHandle;
             UpdateRect();
             UpdateContext();

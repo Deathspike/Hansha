@@ -1,6 +1,6 @@
 ﻿namespace Hansha.Core
 {
-    public struct ScreenFrame
+    public class ScreenFrame
     {
         public ScreenFrameRectangle Boundaries;
         public ScreenFrameRectangle[] ModifiedRegions;

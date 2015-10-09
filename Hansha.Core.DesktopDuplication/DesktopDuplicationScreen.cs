@@ -15,10 +15,10 @@ namespace Hansha.Core.DesktopDuplication
     {
         private readonly Device _device;
         private readonly RawRectangle _desktopBounds;
+        private readonly ScreenFrame _frame;
         private readonly OutputDuplication _outputDuplication;
         private readonly Texture2DDescription _texture2DDescription;
         private Texture2D _desktopImageTexture;
-        private ScreenFrame _frame;
         private OutputDuplicateFrameInformation _frameInfo;
         private byte[] _newPixels;
         private byte[] _previousPixels;
@@ -84,7 +84,7 @@ namespace Hansha.Core.DesktopDuplication
                 _outputDuplication.GetFrameDirtyRects(rectangles.Length, rectangles, out numberOfBytes);
             }
 
-            _frame.ModifiedRegions = new ScreenFrameRectangle[numberOfBytes / Marshal.SizeOf(typeof(OutputDuplicateMoveRectangle))];
+            _frame.ModifiedRegions = new ScreenFrameRectangle[numberOfBytes / Marshal.SizeOf(typeof(RawRectangle))];
 
             for (var i = 0; i < _frame.ModifiedRegions.Length; i++)
             {
@@ -175,6 +175,7 @@ namespace Hansha.Core.DesktopDuplication
                 using (var output = InitializeOutput(adapter, outputIndex))
                 {
                     _desktopBounds = output.Description.DesktopBounds;
+                    _frame = new ScreenFrame();
                     _outputDuplication = InitializeOutputDuplication(output);
                     _texture2DDescription = InitializeTexture2DDescription(_desktopBounds);
                 }
@@ -262,7 +263,7 @@ namespace Hansha.Core.DesktopDuplication
         {
             if (!AcquireNextFrame(timeoutInMilliseconds))
             {
-                return _frame;
+                return null;
             }
 
             try
