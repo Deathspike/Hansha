@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 namespace Hansha
 {
+    // TODO: Remove this class from existence. This is merely a measurement tool.
     public class DebugStream : IProtocolStream
     {
         private readonly IProtocolStream _protocolStream;
@@ -34,12 +35,12 @@ namespace Hansha
         {
             if (_reportTime == null || _reportTime <= DateTime.Now)
             {
-                Console.WriteLine("{0}KB/s", _numberOfBytes / 1024);
+                Console.WriteLine("{0}MB/s", ((float)_numberOfBytes / 1024 / 1024).ToString("0.00"));
                 _numberOfBytes = 0;
                 _reportTime = DateTime.Now.AddSeconds(1);
             }
 
-            _numberOfBytes += buffer.Length;
+            _numberOfBytes += count;
 
             return _protocolStream.SendAsync(buffer, offset, count);
         }
