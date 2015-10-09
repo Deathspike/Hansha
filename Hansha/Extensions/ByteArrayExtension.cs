@@ -6,47 +6,30 @@ namespace Hansha
 {
     public static class ByteArrayExtension
     {
-        public static byte[] Compress(this byte[] byteArray)
+        public static int CompressQuick(this byte[] uncompressed, int offset, int count, byte[] compressed)
         {
-            byte[] output;
-
-            using (var ms = new MemoryStream())
+            using (var memoryStream = new MemoryStream(compressed))
             {
-                using (var gs = new DeflateStream(ms, CompressionMode.Compress))
+                using (var deflateStream = new GZipStream(memoryStream, CompressionLevel.Fastest, true))
                 {
-                    gs.Write(byteArray, 0, byteArray.Length);
-                    gs.Close();
-                    output = ms.ToArray();
+                    deflateStream.Write(uncompressed, offset, count);
                 }
 
-                ms.Close();
+                return (int) memoryStream.Position;
             }
-
-            return output;
         }
 
-        public static byte[] Decompress(this byte[] byteArray)
+        public static int DecompressQuick(this byte[] compressed, byte[] uncompressed)
         {
-            var output = new List<byte>();
-
-            using (var ms = new MemoryStream(byteArray))
+            using (var uncompressedMemoryStream = new MemoryStream(uncompressed))
             {
-                using (var gs = new DeflateStream(ms, CompressionMode.Decompress))
+                using (var deflateStream = new GZipStream(new MemoryStream(compressed), CompressionMode.Decompress, true))
                 {
-                    var readByte = gs.ReadByte();
-
-                    while (readByte != -1)
-                    {
-                        output.Add((byte)readByte);
-                        readByte = gs.ReadByte();
-                    }
-
-                    gs.Close();
+                    deflateStream.CopyTo(uncompressedMemoryStream);
                 }
-                ms.Close();
-            }
 
-            return output.ToArray();
+                return (int)uncompressedMemoryStream.Position;
+            }
         }
     }
 }
