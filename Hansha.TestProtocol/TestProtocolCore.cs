@@ -37,9 +37,9 @@ namespace Hansha.TestProtocol
 
             control.Invoke(new Action(() =>
             {
-                var count = buffer.DecompressQuick(_uncompressedBuffer);
-
-                ProcessStart(bitmap, _uncompressedBuffer, 0, count);
+                // var count = buffer.DecompressQuick(_uncompressedBuffer);
+                // ProcessStart(bitmap, _uncompressedBuffer, 0, count);
+                ProcessStart(bitmap, buffer, 0, buffer.Length);
 
                 control.Refresh();
             }));
@@ -51,9 +51,10 @@ namespace Hansha.TestProtocol
 
             control.Invoke(new Action(() =>
             {
-                var count = buffer.DecompressQuick(_uncompressedBuffer);
+                // var count = buffer.DecompressQuick(_uncompressedBuffer);
+                // ProcessDelta(bitmap, _uncompressedBuffer, 0, count);
 
-                ProcessDelta(bitmap, _uncompressedBuffer, 0, count);
+                ProcessDelta(bitmap, buffer, 0, buffer.Length);
 
                 control.Refresh();
             }));

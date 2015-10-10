@@ -10,32 +10,47 @@ namespace Hansha
     {
         private readonly IProtocolStream _protocolStream;
         private byte[] _buffer;
-        private byte[] _bufferC;
         private MemoryStream _stream;
         private BinaryWriter _writer;
 
         #region Abstract
 
-        private void ProcessModifiedRegions(ScreenFrame frame)
+        // TODO: Yeah. This method runs in an unsafe context because of performance. Actually, because I wanted to avoid
+        // MemoryStream and BinaryWriter. Performance can be similar by taking advantage of the JIT's clever tricks to
+        // avoid array boundary checks. It shouldn't matter too much. Probably. Introduce a different kind of writer that
+        // avoids the overhead of everything entirely? Can operate on a raw buffer directly... that'll be next!
+        private unsafe void ProcessModifiedRegions(ScreenFrame frame)
         {
-            var n = frame.NewPixels;
-            var p = frame.PreviousPixels;
-
-            foreach (var region in frame.ModifiedRegions)
+            fixed (byte* bBasePointer = &_buffer[0])
+            fixed (byte* nBasePointer = &frame.NewPixels[0])
+            fixed (byte* pBasePointer = &frame.PreviousPixels[0])
             {
+                var position = _stream.Position;
                 var widthInBytes = frame.Boundaries.Right * 4;
-
-                for (int y = region.Top, yOffset = y * widthInBytes; y < region.Bottom; y++, yOffset += widthInBytes)
+                
+                foreach (var region in frame.ModifiedRegions)
                 {
-                    for (int x = region.Left, xOffset = x * 4, i = yOffset + xOffset; x < region.Right; x++, i += 4)
+                    for (int y = region.Top, yOffset = y * widthInBytes; y < region.Bottom; y++, yOffset += widthInBytes)
                     {
-                        if (n[i] == p[i] && n[i + 1] == p[i + 1] && n[i + 2] == p[i + 2]) continue;
-                        _writer.Write(i);
-                        _writer.Write(n[i]);
-                        _writer.Write(n[i + 1]);
-                        _writer.Write(n[i + 2]);
+                        var xOffset = region.Left * 4;
+                        var iOffset = yOffset + xOffset;
+                        var nPointer = nBasePointer + iOffset;
+                        var pPointer = pBasePointer + iOffset;
+
+                        for (var x = region.Left; x < region.Right; x++, iOffset += 4, nPointer += 4, pPointer += 4)
+                        {
+                            if (nPointer[0] == pPointer[0] && nPointer[1] == pPointer[1] && nPointer[2] == pPointer[2]) continue;
+                            var bPointer = bBasePointer + position;
+                            *(int*) bPointer = iOffset;
+                            bPointer[4] = nPointer[0];
+                            bPointer[5] = nPointer[1];
+                            bPointer[6] = nPointer[2];
+                            position += 7;
+                        }
                     }
                 }
+
+                _stream.Position = position;
             }
         }
 
@@ -70,7 +85,6 @@ namespace Hansha
         public async Task StartAsync(ScreenFrame frame)
         {
             _buffer = new byte[frame.Boundaries.Bottom * frame.Boundaries.Right * 7];
-            _bufferC = new byte[_buffer.Length];
             _stream = new MemoryStream(_buffer);
             _writer = new BinaryWriter(_stream);
 
@@ -84,9 +98,11 @@ namespace Hansha
                 _writer.Write(frame.NewPixels[i + 2]);
             }
 
-            var clen = _buffer.CompressQuick(0, (int)_stream.Position, _bufferC);
+            // var clen = _buffer.CompressQuick(0, (int)_stream.Position, _bufferC);
 
-            await _protocolStream.SendAsync(_bufferC, 0, clen);
+            // await _protocolStream.SendAsync(_bufferC, 0, clen);
+
+            await _protocolStream.SendAsync(_buffer, 0, (int) _stream.Position);
         }
 
 
@@ -99,11 +115,15 @@ namespace Hansha
             ProcessMovedRegions(frame);
             ProcessModifiedRegions(frame);
 
-            var clen = _buffer.CompressQuick(0, (int)_stream.Position, _bufferC);
+            // var clen = _buffer.CompressQuick(0, (int)_stream.Position, _bufferC);
 
-            Console.WriteLine("Frame in {0}ms", (DateTime.Now - beginTime).TotalMilliseconds);
+            Console.WriteLine("Proc in {0}ms", (DateTime.Now - beginTime).TotalMilliseconds);
 
-            await _protocolStream.SendAsync(_bufferC, 0, clen);
+            // await _protocolStream.SendAsync(_bufferC, 0, clen);
+
+            await _protocolStream.SendAsync(_buffer, 0, (int)_stream.Position);
+
+            Console.WriteLine("Sent in {0}ms", (DateTime.Now - beginTime).TotalMilliseconds);
         }
 
         #endregion
