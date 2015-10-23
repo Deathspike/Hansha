@@ -1,6 +1,5 @@
-using System.Collections.Generic;
+using lz4;
 using System.IO;
-using System.IO.Compression;
 
 namespace Hansha
 {
@@ -10,7 +9,7 @@ namespace Hansha
         {
             using (var memoryStream = new MemoryStream(compressed))
             {
-                using (var deflateStream = new GZipStream(memoryStream, CompressionLevel.Fastest, true))
+                using (var deflateStream = LZ4Stream.CreateCompressor(memoryStream, LZ4StreamMode.Write, leaveInnerStreamOpen: true))
                 {
                     deflateStream.Write(uncompressed, offset, count);
                 }
@@ -23,7 +22,7 @@ namespace Hansha
         {
             using (var uncompressedMemoryStream = new MemoryStream(uncompressed))
             {
-                using (var deflateStream = new GZipStream(new MemoryStream(compressed), CompressionMode.Decompress, true))
+                using (var deflateStream = LZ4Stream.CreateDecompressor(new MemoryStream(compressed), LZ4StreamMode.Read, true))
                 {
                     deflateStream.CopyTo(uncompressedMemoryStream);
                 }

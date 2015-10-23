@@ -6,7 +6,6 @@ using Hansha.Core;
 
 namespace Hansha
 {
-    // TODO: permessage-deflate. How do I get this? A new WebSocket handler? Protocols should not be aware of compression.
     public class ProtocolHandler : IHandler
     {
         private readonly int _maximumFramesPerSecond;

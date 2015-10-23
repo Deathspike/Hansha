@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 
 namespace Hansha
 {
-    // TODO: Remove this class from existence. This is merely a measurement tool.
     public class DebugStream : IProtocolStream
     {
         private readonly IProtocolStream _protocolStream;
